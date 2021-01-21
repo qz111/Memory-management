@@ -12,6 +12,7 @@
 ChatBot::ChatBot()
 {
     // invalidate data handles
+    //std::cout<<"implicit chatbot constructor"<<std::endl;
     _image = nullptr;
     _chatLogic = nullptr;
     _rootNode = nullptr;
@@ -41,12 +42,56 @@ ChatBot::~ChatBot()
         _image = NULL;
     }
 }
-
-//// STUDENT CODE
-////
-
-////
-//// EOF STUDENT CODE
+ChatBot::ChatBot(const ChatBot &source)
+{
+    std::cout<< "ChatBot Copy Constructor"<< std::endl;
+    _image = new wxBitmap();
+    *_image = *source._image;
+    _chatLogic = source._chatLogic;
+    _rootNode = source._rootNode;
+    _currentNode = source._currentNode;
+}
+ChatBot& ChatBot::operator=(const ChatBot &source)
+{
+    std::cout<< "ChatBot Copy Assignment Operator"<< std::endl;
+    if(this == &source)
+        return *this;
+    delete _image;
+    _image = new wxBitmap();
+    *_image = *source._image;
+    _chatLogic = source._chatLogic;
+    _rootNode = source._rootNode;
+    _currentNode = source._currentNode;
+    return *this;
+}
+ChatBot::ChatBot(ChatBot &&source)
+{
+    std::cout<< "ChatBot Move Constructor"<< std::endl;
+    _image = source._image;
+    _chatLogic = source._chatLogic;
+    _rootNode = source._rootNode;
+    _currentNode = source._currentNode;
+    source._image = nullptr;
+    source._chatLogic = nullptr;
+    source._rootNode = nullptr;
+    source._currentNode = nullptr;
+}
+ChatBot& ChatBot::operator=(ChatBot &&source)
+{
+    std::cout<< "ChatBot Move Assignment Operator"<< std::endl;
+    if(this == &source)
+        return *this;
+    delete _image;
+    _image = source._image;
+    _chatLogic = source._chatLogic;
+    _rootNode = source._rootNode;
+    _currentNode = source._currentNode;
+    source._image = nullptr;
+    source._chatLogic = nullptr;
+    source._rootNode = nullptr;
+    source._currentNode = nullptr;
+    return *this;
+}
 
 void ChatBot::ReceiveMessageFromUser(std::string message)
 {
@@ -92,8 +137,8 @@ void ChatBot::SetCurrentNode(GraphNode *node)
     std::mt19937 generator(int(std::time(0)));
     std::uniform_int_distribution<int> dis(0, answers.size() - 1);
     std::string answer = answers.at(dis(generator));
-
     // send selected node answer to user
+    _chatLogic->SetChatbotHandle(this);
     _chatLogic->SendMessageToUser(answer);
 }
 
